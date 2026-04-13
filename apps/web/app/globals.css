@@ -1,56 +1,103 @@
 :root {
   color-scheme: dark;
-  --bg: #0a0a0b;
-  --fg: #e8e8ed;
-  --muted: #9898a4;
-  --accent: #3b82f6;
+  
+  /* Claude Dark Adaptation */
+  --bg-parchment: #141413;    /* Near Black warm olive-black */
+  --bg-surface: #1a1a18;      /* Warm dark raised surface */
+  --bg-elevated: #21211e;     /* Floating elements */
+  
+  --border-light: #2a2a27;    /* Subtle warm border */
+  --border-strong: #3a3a36;   /* Stronger warm border */
+  
+  --text-primary: #faf9f5;    /* Ivory */
+  --text-secondary: #b0aea5;  /* Warm Silver */
+  --text-tertiary: #87867f;   /* Stone Gray */
+  
+  --brand-terracotta: #c96442;
+  --brand-coral: #d97757;
+  
+  --focus-blue: #3898ec;
+  
+  /* Security Semantics */
+  --severity-critical: #ef4444;
+  --severity-high: #f97316;
+  --severity-medium: #f59e0b;
+  --severity-low: #3b82f6;
+  --severity-info: #87867f;
+  
+  --status-pass: #10b981;
+  --status-fail: #ef4444;
+  --status-skip: #87867f;
+  
+  /* Design System Radii */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
 }
 
-*,
-*::before,
-*::after {
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
 html {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  line-height: 1.5;
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  line-height: 1.6; /* Generous Claude-like line height */
+  background: var(--bg-parchment);
+  color: var(--text-primary);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--bg);
-  color: var(--fg);
+  display: flex;
+  flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 500;
+  line-height: 1.2;
+  margin-top: 0;
+  margin-bottom: 1rem;
 }
 
 a {
-  color: var(--accent);
+  color: var(--brand-coral);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 a:focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--focus-blue);
   outline-offset: 2px;
 }
 
-main {
-  max-width: 42rem;
-  margin: 0 auto;
-  padding: 2rem 1.25rem 4rem;
+code, pre {
+  font-family: var(--font-mono), monospace;
 }
 
-h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
+/* Ring Shadow utility for Claude style depth */
+.ring-shadow {
+  box-shadow: 0px 0px 0px 1px var(--border-light);
 }
 
-p.lead {
-  font-size: 1.05rem;
-  color: var(--muted);
+.ring-shadow:hover {
+  box-shadow: 0px 0px 0px 1px var(--border-strong);
 }
 
-p {
-  margin: 0 0 1rem;
+.whisper-shadow {
+  box-shadow: rgba(0, 0, 0, 0.4) 0px 4px 24px, 0px 0px 0px 1px var(--border-light);
 }
+
+/* Utility classes */
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary { color: var(--text-tertiary); }
+.text-terracotta { color: var(--brand-terracotta); }
+
+.bg-surface { background-color: var(--bg-surface); }
+.bg-elevated { background-color: var(--bg-elevated); }

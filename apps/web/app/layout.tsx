@@ -1,7 +1,22 @@
 import type { Metadata } from "next";
+import { Inter, DM_Serif_Display, JetBrains_Mono } from "next/font/google";
 import { siteUrl } from "@/lib/site";
 import { softwareApplicationJsonLd } from "@/lib/json-ld";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
+const dmSerif = DM_Serif_Display({
+  weight: ["400"],
+  subsets: ["latin"],
+  variable: "--font-serif",
+});
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
 
 const base = siteUrl();
 
@@ -49,7 +64,7 @@ export default function RootLayout({
 }>) {
   const jsonLd = softwareApplicationJsonLd();
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${dmSerif.variable} ${jetBrainsMono.variable}`}>
       <body>
         <script
           type="application/ld+json"

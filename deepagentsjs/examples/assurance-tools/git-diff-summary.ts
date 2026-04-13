@@ -17,12 +17,14 @@ const schema = z.object({
     .describe("If true, run git status --porcelain instead of diff"),
 });
 
+
+
 /**
  * Read-only git summary for assurance lane §D.
  */
 export const gitDiffSummaryTool = tool(
   async (input) => {
-    const cwd = input.cwd ?? process.cwd();
+    const cwd = input.cwd && input.cwd.trim() !== "" ? input.cwd : process.cwd();
     if (input.stat) {
       const { stdout } = await execFileAsync(
         "git",

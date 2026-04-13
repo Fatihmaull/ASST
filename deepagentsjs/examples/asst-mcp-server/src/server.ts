@@ -13,6 +13,13 @@ import { z } from "zod";
 
 import { mergeSarifLogs, parseSarifJson } from "../../assurance-run/src/merge-sarif.js";
 import { runSemgrepScan } from "../../assurance-run/src/run-semgrep.js";
+import { programAccountAnalyzerTool } from "../../assurance-tools/program-account-analyzer.js";
+import { programUpgradeMonitorTool } from "../../assurance-tools/program-upgrade-monitor.js";
+import { cpiGraphMapperTool } from "../../assurance-tools/cpi-graph-mapper.js";
+import { accountStateSnapshotTool } from "../../assurance-tools/account-state-snapshot.js";
+import { secretScannerTool } from "../../assurance-tools/secret-scanner.js";
+import { envHygieneCheckTool } from "../../assurance-tools/env-hygiene-check.js";
+import { unifiedPostureReportTool } from "../../assurance-tools/unified-posture-report.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -27,9 +34,89 @@ const server = new McpServer(
   { name: "asst-assurance", version: "0.1.0" },
   {
     instructions:
-      "ASST assurance tools: Semgrep SARIF scan, merge SARIF files, git diff summary, Solana JSON-RPC (read-only), write assurance manifest via repo CLI. " +
+      "ASST assurance tools: Semgrep SARIF scan, merge SARIF files, git diff summary, Solana JSON-RPC (read-only), write assurance manifest via repo CLI. Expanded tools include program account analyzer, upgrade monitor, CPI graph mapper, and account snapshot. " +
       "Requires semgrep in PATH for scans; set SOLANA_RPC_URL for custom RPC. write_assurance_manifest runs pnpm from deepagentsjsRoot.",
   },
+);
+
+server.registerTool(
+  "asst_program_account_analyzer",
+  {
+    description: "Analyzes a Solana program address, retrieving execution status, upgrade authority, and total accounts owned.",
+    inputSchema: {
+      programId: z.string().describe("Solana program address"),
+      rpcUrl: z.string().optional().describe("Optional custom RPC URL"),
+    },
+  },
+  async (args) => {
+    try {
+      const res = await programAccountAnalyzerTool.invoke(args);
+      return textResult(res);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return textResult(msg, true);
+    }
+  }
+);
+
+server.registerTool(
+  "asst_program_upgrade_monitor",
+  {
+    description: "Checks if a Solana program is upgradable, getting its BPF loader info and Program Data Account.",
+    inputSchema: {
+      programId: z.string().describe("Solana program address to target"),
+      slotInfo: z.string().optional().describe("Latest slot or commitment"),
+    },
+  },
+  async (args) => {
+    try {
+      const res = await programUpgradeMonitorTool.invoke(args);
+      return textResult(res);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return textResult(msg, true);
+    }
+  }
+);
+
+server.registerTool(
+  "asst_cpi_graph_mapper",
+  {
+    description: "Analyzes an Anchor IDL JSON file to extract program instructions, account structures, and identify potential risks like missing signers.",
+    inputSchema: {
+      idlPath: z.string().describe("Path to Anchor IDL JSON file"),
+    },
+  },
+  async (args) => {
+    try {
+      const res = await cpiGraphMapperTool.invoke(args);
+      return textResult(res);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return textResult(msg, true);
+    }
+  }
+);
+
+server.registerTool(
+  "asst_account_state_snapshot",
+  {
+    description: "Takes a snapshot of raw account state data from Solana and saves it to the evidence directory.",
+    inputSchema: {
+      programId: z.string().describe("Solana program address or account"),
+      rpcUrl: z.string().optional().describe("Optional custom RPC URL"),
+      outDir: z.string().optional().describe("Output directory. Defaults to 'assurance/snapshots'"),
+    },
+  },
+  async (args) => {
+    try {
+      const res = await accountStateSnapshotTool.invoke(args);
+      return textResult(res);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return textResult(msg, true);
+    }
+  }
 );
 
 server.registerTool(
@@ -209,6 +296,63 @@ server.registerTool(
       return textResult(msg, true);
     }
   },
+);
+
+server.registerTool(
+  "asst_secret_scanner",
+  {
+    description: "Scans the git repository history for committed hardcoded secrets like API keys and private keys.",
+    inputSchema: {
+      cwd: z.string().describe("Repository root to scan"),
+    },
+  },
+  async (args) => {
+    try {
+      const res = await secretScannerTool.invoke(args);
+      return textResult(res);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return textResult(msg, true);
+    }
+  }
+);
+
+server.registerTool(
+  "asst_env_hygiene_check",
+  {
+    description: "Validates repository environment configuration hygiene (e.g., .env ignores, example files).",
+    inputSchema: {
+      cwd: z.string().describe("Repository root to check"),
+    },
+  },
+  async (args) => {
+    try {
+      const res = await envHygieneCheckTool.invoke(args);
+      return textResult(res);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return textResult(msg, true);
+    }
+  }
+);
+
+server.registerTool(
+  "asst_unified_posture_report",
+  {
+    description: "Helps generate the top-level 8-layer score for the dashboard.",
+    inputSchema: {
+      assuranceDir: z.string().describe("Path to assurance output directory"),
+    },
+  },
+  async (args) => {
+    try {
+      const res = await unifiedPostureReportTool.invoke(args);
+      return textResult(res);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return textResult(msg, true);
+    }
+  }
 );
 
 const transport = new StdioServerTransport();
