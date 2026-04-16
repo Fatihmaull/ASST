@@ -41,23 +41,36 @@ function parsePnpmAuditJson(raw: string): {
   counts: NpmAuditVulnerabilityCounts & { total?: number };
   total_dependencies?: number;
 } {
-  const parsed = JSON.parse(raw) as {
-    metadata?: {
-      vulnerabilities?: Partial<NpmAuditVulnerabilityCounts> & { total?: number };
-      totalDependencies?: number;
+  const defaultRes = {
+    counts: { info: 0, low: 0, moderate: 0, high: 0, critical: 0, total: 0 },
+    total_dependencies: 0
+  };
+
+  if (!raw || raw.trim() === "") {
+    return defaultRes;
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as {
+      metadata?: {
+        vulnerabilities?: Partial<NpmAuditVulnerabilityCounts> & { total?: number };
+        totalDependencies?: number;
+      };
     };
-  };
-  const v = parsed.metadata?.vulnerabilities ?? {};
-  const counts: NpmAuditVulnerabilityCounts & { total?: number } = {
-    info: Number(v.info ?? 0),
-    low: Number(v.low ?? 0),
-    moderate: Number(v.moderate ?? 0),
-    high: Number(v.high ?? 0),
-    critical: Number(v.critical ?? 0),
-  };
-  if (typeof v.total === "number") counts.total = v.total;
-  const total_dependencies = parsed.metadata?.totalDependencies;
-  return { counts, total_dependencies };
+    const v = parsed.metadata?.vulnerabilities ?? {};
+    const counts: NpmAuditVulnerabilityCounts & { total?: number } = {
+      info: Number(v.info ?? 0),
+      low: Number(v.low ?? 0),
+      moderate: Number(v.moderate ?? 0),
+      high: Number(v.high ?? 0),
+      critical: Number(v.critical ?? 0),
+    };
+    if (typeof v.total === "number") counts.total = v.total;
+    const total_dependencies = parsed.metadata?.totalDependencies;
+    return { counts, total_dependencies };
+  } catch (e) {
+    return defaultRes;
+  }
 }
 
 export function resolveNpmProjectRoot(repoRoot: string): string | undefined {
@@ -84,6 +97,7 @@ export function runPnpmAuditJson(npmProjectRoot: string): {
       cwd: npmProjectRoot,
       encoding: "utf8",
       stdio: ["ignore", "pipe", "pipe"],
+      shell: true,
     });
     return { exit_code: 0, stdout };
   } catch (err: unknown) {

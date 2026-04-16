@@ -1,6 +1,7 @@
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { ChatOpenRouter } from "@langchain/openrouter";
-import { HumanMessage, AIMessage, BaseMessage } from "@langchain/core/messages";
+import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
+import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import { 
   solanaRpcReadTool, 
   gitCloneRepoTool, 
@@ -14,23 +15,55 @@ import {
   envHygieneCheckTool,
   unifiedPostureReportTool,
   generatePdfReportTool
-} from "../../../../deepagentsjs/examples/assurance-tools/index.js";
+} from "./assurance-tools/index.js";
 import { readFileTool, writeFileTool, runTerminalCmdTool } from "./tools.js";
 import { ASSTPersistence } from "./persistence.js";
+
+const FALLBACK_MODELS = [
+  "gemini-2.5-flash",
+  "gemini-3.1-flash-lite",
+  "mistralai/mistral-7b-instruct:free"
+];
 
 export class ASSTAgentEngine {
   private agent: any;
   private persistence: ASSTPersistence;
+  public currentModel: string;
+  private repoRoot: string;
 
-  constructor(repoRoot: string, modelId: string = "meta-llama/llama-3.3-70b-instruct:free") {
-    if (!process.env.OPENROUTER_API_KEY) {
-      throw new Error("Missing OPENROUTER_API_KEY in environment or .env file. Please add it to continue.");
-    }
+  constructor(repoRoot: string, modelId: string = "gemini-2.5-flash") {
+    this.repoRoot = repoRoot;
+    this.currentModel = modelId;
     this.persistence = new ASSTPersistence(repoRoot);
+    this.initAgent(modelId);
+  }
+
+  private initAgent(modelId: string) {
+    this.currentModel = modelId;
     
-    const llm = new ChatOpenRouter({
-      model: modelId,
-    });
+    let llm: any;
+
+    if (modelId.startsWith("gemini")) {
+      const apiKey = process.env.GOOGLE_API_KEY;
+      if (!apiKey) {
+        throw new Error("Missing GOOGLE_API_KEY. Gemini models require a direct Google AI Studio key.");
+      }
+      llm = new ChatGoogleGenerativeAI({
+        model: modelId,
+        apiKey,
+        temperature: 0.1,
+      });
+    } else {
+      const apiKey = process.env.OPENROUTER_API_KEY;
+      if (!apiKey) {
+        throw new Error("Missing OPENROUTER_API_KEY. OpenRouter models require an API key.");
+      }
+      llm = new ChatOpenRouter({
+        model: modelId,
+        apiKey,
+        temperature: 0.1,
+      });
+    }
 
     const tools = [
       solanaRpcReadTool,
@@ -52,7 +85,7 @@ export class ASSTAgentEngine {
     this.agent = createReactAgent({
       llm,
       tools,
-      messageModifier: "You are ASST Terminal, a persistent security agent. Maintain session history and help develop/audit Solana code."
+      messageModifier: `You are ASST Terminal, a persistent security agent. You are currently using model: ${modelId} (${modelId.startsWith("gemini") ? "Direct Google SDK" : "OpenRouter"}). Maintain session history and help develop/audit Solana code.`
     });
   }
 
@@ -60,28 +93,54 @@ export class ASSTAgentEngine {
     await this.persistence.init();
   }
 
-  async chat(input: string) {
-    // Load history
-    const rawHistory = await this.persistence.getHistory(10) as any[];
-    const messages = rawHistory.reverse().map(m => 
-      m.role === "user" ? new HumanMessage(m.content) : new AIMessage(m.content)
-    );
-    messages.push(new HumanMessage(input));
+  async chat(input: string, fallbackIdx: number = -1): Promise<string> {
+    try {
+      const rawHistory = await this.persistence.getHistory(10) as any[];
+      const messages = rawHistory.reverse().map(m => 
+        m.role === "user" ? new HumanMessage(m.content) : new AIMessage(m.content)
+      );
+      messages.push(new HumanMessage(input));
 
-    // Save user input
-    await this.persistence.addHistory("user", input);
+      if (fallbackIdx === -1) {
+        await this.persistence.addHistory("user", input);
+      }
 
-    // Invoke agent
-    const result = await this.agent.invoke({ messages });
-    
-    // Find last AI response
-    const lastMsg = result.messages[result.messages.length - 1];
-    const responseText = typeof lastMsg.content === 'string' ? lastMsg.content : JSON.stringify(lastMsg.content);
+      const result = await this.agent.invoke({ messages });
+      const lastMsg = result.messages[result.messages.length - 1];
+      const responseText = this.formatMessageContent(lastMsg.content);
 
-    // Save agent response
-    await this.persistence.addHistory("agent", responseText);
+      await this.persistence.addHistory("agent", responseText);
+      return responseText;
+    } catch (error: any) {
+      const nextIdx = fallbackIdx + 1;
+      
+      if (error?.message?.includes("rate-limited") || error?.message?.includes("429") || error?.status === 429) {
+        if (nextIdx < FALLBACK_MODELS.length) {
+          const fallbackModel = FALLBACK_MODELS[nextIdx];
+          console.log(`\n[FALLBACK] ${this.currentModel} is busy. Switching to ${fallbackModel}...`);
+          this.initAgent(fallbackModel);
+          return this.chat(input, nextIdx);
+        }
+      }
+      
+      throw error;
+    }
+  }
 
-    return responseText;
+  private formatMessageContent(content: any): string {
+    if (typeof content === "string") return content;
+    if (Array.isArray(content)) {
+      return content
+        .map((part) => {
+          if (typeof part === "string") return part;
+          if (part.text) return part.text;
+          if (part.type === "text") return part.text;
+          return "";
+        })
+        .join("")
+        .trim();
+    }
+    return String(content || "");
   }
 
   async close() {

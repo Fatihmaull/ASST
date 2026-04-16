@@ -1,74 +1,89 @@
-import sqlite3 from "sqlite3";
-import { promisify } from "node:util";
 import { join } from "node:path";
 import { existsSync, mkdirSync } from "node:fs";
 
+// lowdb is ESM-only, but esbuild will bundle it correctly for our CJS target
+import { JSONFilePreset } from 'lowdb/node';
+
+interface ChatMessage {
+  role: string;
+  content: string;
+  timestamp: string;
+}
+
+interface IndexRecord {
+  path: string;
+  content_hash: string;
+  last_indexed: string;
+}
+
+interface Data {
+  chat_history: ChatMessage[];
+  code_index: IndexRecord[];
+}
+
 export class ASSTPersistence {
-  private db: sqlite3.Database;
-  private runQuery: any;
+  private db: any;
+  private repoRoot: string;
 
   constructor(repoRoot: string) {
-    const asstDir = join(repoRoot, ".asst");
+    this.repoRoot = repoRoot;
+  }
+
+  async init() {
+    const asstDir = join(this.repoRoot, ".asst");
     if (!existsSync(asstDir)) {
       mkdirSync(asstDir, { recursive: true });
     }
 
-    const dbPath = join(asstDir, "asst.db");
-    this.db = new sqlite3.Database(dbPath);
-    this.runQuery = promisify(this.db.run.bind(this.db));
+    const dbPath = join(asstDir, "asst.json");
+    
+    // Initialize lowdb with default data
+    this.db = await JSONFilePreset<Data>(dbPath, { 
+      chat_history: [],
+      code_index: []
+    });
   }
 
-  async init() {
-    await this.runQuery(`
-      CREATE TABLE IF NOT EXISTS chat_history (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-        role TEXT,
-        content TEXT
-      )
-    `);
-
   async upsertCodeIndex(path: string, hash: string) {
-    await this.runQuery(
-      "INSERT INTO code_index (path, content_hash, last_indexed) VALUES (?, ?, CURRENT_TIMESTAMP) ON CONFLICT(path) DO UPDATE SET content_hash=excluded.content_hash, last_indexed=excluded.last_indexed",
-      [path, hash]
-    );
+    const index = this.db.data.code_index.findIndex((r: any) => r.path === path);
+    const record = {
+      path,
+      content_hash: hash,
+      last_indexed: new Date().toISOString()
+    };
+
+    if (index > -1) {
+      this.db.data.code_index[index] = record;
+    } else {
+      this.db.data.code_index.push(record);
+    }
+    await this.db.write();
   }
 
   async searchCodeIndex(term: string) {
-    return new Promise((resolve, reject) => {
-      this.db.all(
-        "SELECT path FROM code_index WHERE path LIKE ? OR content_hash LIKE ? LIMIT 20",
-        [`%${term}%`, `%${term}%`],
-        (err, rows) => {
-          if (err) reject(err);
-          else resolve(rows);
-        }
-      );
-    });
+    return this.db.data.code_index
+      .filter((r: any) => r.path.includes(term) || r.content_hash.includes(term))
+      .slice(0, 20);
   }
 
   async addHistory(role: string, content: string) {
-    await this.runQuery(
-      "INSERT INTO chat_history (role, content) VALUES (?, ?)",
-      [role, content]
-    );
+    this.db.data.chat_history.push({
+      role,
+      content,
+      timestamp: new Date().toISOString()
+    });
+    await this.db.write();
   }
 
   async getHistory(limit = 50) {
-    return new Promise((resolve, reject) => {
-      this.db.all(
-        "SELECT role, content FROM chat_history ORDER BY timestamp DESC LIMIT ?",
-        [limit],
-        (err, rows) => {
-          if (err) reject(err);
-          else resolve(rows);
-        }
-      );
-    });
+    // Return latest entries first
+    return [...this.db.data.chat_history]
+      .reverse()
+      .slice(0, limit);
   }
 
   async close() {
-    return new Promise((resolve) => this.db.close(() => resolve(true)));
+    // lowdb is auto-closed as it's just a file writer
+    return true;
   }
 }

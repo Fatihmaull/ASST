@@ -72,7 +72,10 @@ export const runTerminalCmdTool = tool(
     }
 
     try {
-      const { stdout, stderr } = await execAsync(command);
+      const { stdout, stderr } = await execAsync(command, { 
+        shell: true,
+        env: { ...process.env } // Explicitly pass current environment
+      });
       return `STDOUT:\n${stdout}\n\nSTDERR:\n${stderr}`;
     } catch (e: any) {
       return `Command failed: ${e.message}\n${e.stderr || ""}`;

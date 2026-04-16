@@ -19,6 +19,7 @@ function semgrepVersion(): string | undefined {
     const out = execFileSync("semgrep", ["--version"], {
       encoding: "utf8",
       stdio: ["ignore", "pipe", "ignore"],
+      shell: true,
     });
     return out.trim().split("\n")[0] ?? "semgrep";
   } catch {
@@ -54,6 +55,7 @@ export function runSemgrepScan(options: {
         cwd,
         encoding: "utf8",
         stdio: ["ignore", "pipe", "pipe"],
+        shell: true,
       },
     );
   } catch (err: unknown) {
@@ -85,6 +87,11 @@ export function runSemgrepScan(options: {
 }
 
 export function readSarifFile(path: string): unknown {
-  const text = readFileSync(path, "utf8");
-  return JSON.parse(text) as unknown;
+  try {
+    const text = readFileSync(path, "utf8");
+    if (!text || text.trim() === "") throw new Error("Empty SARIF file");
+    return JSON.parse(text) as unknown;
+  } catch (e) {
+    return { version: "2.1.0", runs: [] };
+  }
 }

@@ -2,9 +2,9 @@ import { intro, outro, text, spinner } from "@clack/prompts";
 import { theme } from "../ui/theme.js";
 import { ASSTAgentEngine } from "../engine/agent.js";
 
-export async function chatCommand() {
+export async function chatCommand(options: { model: string }) {
   const repoRoot = process.cwd();
-  const agent = new ASSTAgentEngine(repoRoot);
+  const agent = new ASSTAgentEngine(repoRoot, options.model);
   await agent.init();
 
   intro(theme.accent(" ASST INTERACTIVE SHELL "));
