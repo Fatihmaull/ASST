@@ -1,14 +1,16 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: ==========================================
-:: ASST CLI Agent Launcher (V6 - PRODUCTION)
-:: ==========================================
+:: ================================================
+:: ASST CLI Agent Launcher (V7 - MULTI-AGENT)
+:: Orchestrator: gemini-2.5-flash (reasoning)
+:: Sub-agents: 6 specialized security analysts
+:: ================================================
 
 set "ROOT=C:\Users\FTHMo\OneDrive\Documents\ASST"
 set "CLI_DIR=%ROOT%\apps\asst-cli"
 
-echo [ASST] Launching ARES Agentic Shell...
+echo [ASST] Launching Multi-Agent Security Shell (V7)...
 echo.
 
 :: Navigate to CLI directory

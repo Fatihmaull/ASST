@@ -1,0 +1,230 @@
+{
+  "version": 1,
+  "skills": {
+    "address-clustering-attribution": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "3e2ee1eb136658a6ee618a744ab9b1c43ad8a9fd980d84fb29e321e0f60e5753"
+    },
+    "address-screening-workflow-concepts": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "b19c22c6cc8353e1e7ea4fc6e4308986bc9740cffe0a500be4cff3d45bdca2df"
+    },
+    "agentskills-specification": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "fd4dd5662fd0819f4ca23831d1502e5cc752942807a2e1e3434ba2794db9a109"
+    },
+    "arkham-leading-crypto-analysis-tools": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "0fbc614fe08369908dd89628051a70e6dd77dc1584bf6b5bd15dbf863c541713"
+    },
+    "armaniferrante-x-status-solana-reference": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "b8519e72549c8bfca96fd45238726e78e262d3bc1bf384b19c9f7e7a775df9e5"
+    },
+    "behavioral-risk-screening-concepts": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "828e42c98644bd61531b792bde532e85ad532b6c56fde033e14ed68a0caf167d"
+    },
+    "bellingcat-investigation-toolkit": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "bd41330d8ae63f32f2ce80b51f857487fc9973761ad3d5f29c305baf4873d864"
+    },
+    "blockchain-analytics-operations": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "d1d317eb191442a29ce2d86bde7fa03fa9211f2bb7215aefeb616b77aa4c12b4"
+    },
+    "blockchain-intelligence-fundamentals": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "bc6b78804036df11aafddf60f57f6600761aec83c787427aa538b59526754ba6"
+    },
+    "blockchain-intelligence-playbook": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "74e36b78895415a375bed8f6a7f4ec97b25086d24925fd6a8d42ad1f5b58b7f3"
+    },
+    "blockchain-spider-toolkit": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "39df912ed59e193fe67da1e6a9df031779209c17dd3e29112598c6a398136297"
+    },
+    "chainalysis-sanctions-screening": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "0ead60fe3d37996e46219efc3b2a8e417b1edda84b774fbec4b8dabe13a5b49d"
+    },
+    "cmichel-smart-contract-auditor-guide": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "925afc7560d9acf0d0cd06bc959e9e15a21d2d06c87f155fefd72363fcf4dd18"
+    },
+    "cross-chain-clustering-techniques-agent": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "d7ee1f86b8272a2c148d302b6c1e6c8cd016f027547d81406f83595c7c3e4cb6"
+    },
+    "crypto-investigation-compliance": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "b79171f1783c582c307d6e5e5d0d12718e0274c7046de65a910511a3a7e06292"
+    },
+    "crypto-market-structures": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "f574e9b9fc946b16ac82d163d6a539cb7ca616dd90423adb8d01f95695e47e1a"
+    },
+    "defi-admin-takeover-mitigation-lessons": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "936dcc3be258a885932022c2cc632c87838a36653f8c4a2ed7860e18067ab6f2"
+    },
+    "defi-security-audit-agent": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "c6801be39097f9b8c3770a0575a32eef96a6c906b33abdb2fa78d74ee6e34d85"
+    },
+    "dune-sim-onchain-analytics": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "94f75e4619354db8e23937609327652496471136c7f8bab0b284655d93f8a7e1"
+    },
+    "evm-solidity-defi-triage-agent": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "6baf75e9e99319b1a1f7db180c358eb42f7a0cb73700748fe6ebc68ec878e749"
+    },
+    "fatf-glossary-reference": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "98655f5bdce30007b69706b2f1152d5a9e33d829ed40ad3bce7227e751ee6157"
+    },
+    "flash-loan-exploit-investigator-agent": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "b5b60388b4c67e6f94497b5f21733e441f15adcf1cc8a897f839b2e2eeb90ff7"
+    },
+    "honeypot-detection-techniques": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "7f9c3d110263d33bf4866cee1b8d0075c963050afc612cfeb0b9341637121892"
+    },
+    "impersonator-dapp-devtools": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "41be1309d4b56e447ff3641ec3fd82222866c39e4cdc6f47815e3feb0980c588"
+    },
+    "katana-web-crawling": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "89982534d427522126efc01de30288a8db2f2478aecd2456e0d2a447ef3e53c2"
+    },
+    "lcamtuf-afl-documentation": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "4977a6b215065aacb0f73697664680de7774705ec5dd8ef2f06cd986536a1929"
+    },
+    "mev-bot-infrastructure-analysis-agent": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "27fd5e8be118fea67b75ad023722de154a6191a2e7601fe480c15c1a841ca06f"
+    },
+    "mev-bot-rug-coordination-investigator-agent": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "1ce016ac641e7f8e19f912e59ac0a0b4d6a29e20e7e5c06250a36270c59ece64"
+    },
+    "mots-transaction-semantics": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "2a09552e4e73bb47a885a22b9600922de089909c87ca805edebfb162cb1ef371"
+    },
+    "neodyme-solana-security-workshop": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "e26cb13fc4f625a65ca08804e4df566c7d10efe37aa7226347242703a0a472f9"
+    },
+    "on-chain-investigator-agent": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "d70bc0cb0cae210a9fdfb51c89dc447ac531640a4f72d589b161c57d397603b2"
+    },
+    "on-chain-research-tokenomics": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "a235146e26fde3c23b444b2a24b88a5162825f7a6e2218298329cd4d4f9cb768"
+    },
+    "osec-solana-auditor-introduction": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "b3f385c71e872937d4091ad4d5fc9238f8802f8e2d3776788e5fb4903dd148ed"
+    },
+    "phalcon-compliance-documentation": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "e6cecfcf26cb444481e896341693dd670821e6b9d98cf7a8d92431faa40780b5"
+    },
+    "range-ai-investigation-playbook": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "7e4da28e65028e90ab706e707150f929632cba7f7b2e805687a53b018733c396"
+    },
+    "risk-exposure-screening-concepts": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "6b592b29887996aee64cc7f87bc7875f4c6b9c4f20bde702da08a4ccbc7f823c"
+    },
+    "rug-pull-pattern-detection-agent": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "e36d4783a4e1b763d55be11ddd243d29dce09deca9d87ebf7658a969454f7f81"
+    },
+    "sandwich-attack-investigator-agent": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "313ddfa177ecdfb58b4db3c948a4239c5e0a57091ee22cd889401f52c493ea98"
+    },
+    "sealevel-attacks-solana": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "ae7572f62aa1f24d8f8c2d9e8d00a1d71bd82a58c3dfa9a9cc0b9dfebb2213e5"
+    },
+    "solana-clustering-advanced": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "49e8ef09b36342752a5be728419ddee4055227cc7429b6b621705dbe757e471a"
+    },
+    "solana-clustering-case-study-agent": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "22b43a91d71024fad8a1a7e1718d59c46159074d405042e465892e8378dbecd7"
+    },
+    "solana-defi-vulnerability-analyst-agent": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "c6e7ef762a02f5ad24b28ad10cca5587168ea408c9c2375affa0c4002c4585a8"
+    },
+    "solana-onchain-intelligence-resources": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "3371a9759135bab123c1bd4636e648e96b9feb84e1424570598e0c74da1e6c73"
+    },
+    "solana-tracing-specialist": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "2288de4567b84d6f17d811a1d80a1cddb5d3d3c05181b9bdc9edb0a7828b9633"
+    },
+    "transaction-screening-workflow-concepts": {
+      "source": "agentic-reserve/blockint-skills",
+      "sourceType": "github",
+      "computedHash": "3324a79def68a25d849115a91f01ae1b15494c3de73f4e30dcee6f7041d7b797"
+    }
+  }
+}

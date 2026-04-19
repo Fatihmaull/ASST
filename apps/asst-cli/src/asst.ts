@@ -10,6 +10,7 @@ import { intro, outro, text, confirm, spinner } from "@clack/prompts";
 import { theme } from "./ui/theme.js";
 import { scanCommand } from "./commands/scan.js";
 import { chatCommand } from "./commands/chat.js";
+import { skillsCommand } from "./commands/skills.js";
 import fs from "node:fs";
 
 // -- Config Management --
@@ -33,32 +34,30 @@ function saveConfig(config: any) {
 }
 
 async function ensureConfig() {
-  if (process.env.OPENROUTER_API_KEY) return;
+  // Multi-agent architecture requires GOOGLE_API_KEY for orchestrator
+  if (!process.env.GOOGLE_API_KEY) {
+    intro(theme.brand(" ASST Configuration Needed "));
+    console.log(theme.info("No GOOGLE_API_KEY found. ASST requires a Google AI Studio key for the orchestrator."));
+    console.log(theme.info("Get one at: https://aistudio.google.com/apikey\n"));
 
-  intro(theme.brand(" ASST Configuration Needed "));
-  console.log(theme.info("No OPENROUTER_API_KEY found. ASST needs an API key to function."));
+    const apiKey = await text({
+      message: "Enter your Google API Key:",
+      placeholder: "AIzaSy...",
+      validate: (value) => {
+        if (!value) return "API Key is required.";
+      }
+    });
 
-  const apiKey = await text({
-    message: "Enter your OpenRouter API Key:",
-    placeholder: "sk-or-...",
-    validate: (value) => {
-      if (!value) return "API Key is required.";
-      if (!value.startsWith("sk-or-")) return "Invalid key format. Should start with sk-or-";
+    if (typeof apiKey === "symbol" || !apiKey) {
+      console.log(theme.error("Configuration cancelled."));
+      process.exit(1);
     }
-  });
 
-  if (typeof apiKey === "symbol" || !apiKey) {
-    console.log(theme.error("Configuration cancelled."));
-    process.exit(1);
+    const envPath = path.join(process.cwd(), ".env.local");
+    fs.appendFileSync(envPath, `\nGOOGLE_API_KEY=${apiKey}\n`);
+    process.env.GOOGLE_API_KEY = apiKey;
+    console.log(theme.accent(`Key saved to ${envPath}`));
   }
-
-  const envPath = path.join(process.cwd(), ".env");
-  const envContent = `OPENROUTER_API_KEY=${apiKey}\n`;
-  
-  fs.writeFileSync(envPath, envContent, { flag: 'a' });
-  process.env.OPENROUTER_API_KEY = apiKey;
-  
-  console.log(theme.success(`\nKey saved to ${envPath}`));
 }
 
 const program = new Command();
@@ -66,28 +65,27 @@ const config = loadConfig();
 
 program
   .name("asst")
-  .description(theme.brand("ASST Terminal") + " - ARES Solana Security Tool CLI")
-  .version("1.1.0");
+  .description(theme.brand("ASST Terminal") + " - ARES Solana Security Tool (Multi-Agent)")
+  .version("2.0.0");
 
 program
   .command("init")
-  .description("Configure ASST environment (API Keys, RPC, etc.)")
+  .description("Configure ASST environment (API Keys)")
   .action(async () => {
     intro(theme.brand(" ASST Terminal: Initialization "));
     await ensureConfig();
-    outro(theme.success("Initialization complete!"));
+    outro(theme.accent("Initialization complete!"));
   });
 
 program
   .command("scan")
-  .description("Run a full security assurance scan (L1-L6)")
-  .argument("[path]", "Path to project root", ".")
-  .option("-m, --model <model>", "LLM model to use")
-  .action(async (targetPath, options) => {
+  .description("Run a deterministic 6-agent security scan")
+  .option("-r, --repo <path>", "Path to project root (default: current directory)")
+  .option("--json", "Output raw JSON for CI/CD pipelines")
+  .action(async (options) => {
     try {
       await ensureConfig();
-      const model = options.model || config.model || "meta-llama/llama-3.3-70b-instruct:free";
-      await scanCommand(targetPath, { ...options, model });
+      await scanCommand({ repo: options.repo, json: options.json });
     } catch (error: any) {
       console.error("\n" + theme.error("Scan Error:") + " " + error.message);
       process.exit(1);
@@ -96,31 +94,22 @@ program
 
 program
   .command("chat")
-  .description("Start an interactive persistent chat session with the ASST agent")
-  .option("-m, --model <model>", "LLM model to use")
+  .description("Start an interactive multi-agent chat session")
+  .option("-m, --model <model>", "Override orchestrator model")
   .action(async (options) => {
     try {
       await ensureConfig();
-      
-      const defaultModel = config.model || "meta-llama/llama-3.3-70b-instruct:free";
-      const model = options.model || defaultModel;
-
-      // Save as default if explicitly provided via flag
-      if (options.model) {
-        saveConfig({ ...config, model });
-      }
-
+      const model = options.model || config.model || "gemini-2.5-flash";
       await chatCommand({ model });
-      
     } catch (error: any) {
       if (error.code === 'ERR_MODULE_NOT_FOUND') {
         console.error(theme.error("\nModule Loading Error: ") + "One of the internal components could not be loaded.");
-        console.log(theme.info("Try running 'npm install' or check the file paths in agent.ts."));
+        console.log(theme.info("Try running 'npm install' or check the file paths."));
       } else {
         console.error("\n" + theme.error("Chat Error:") + " " + error.message);
       }
       
-      // Essential: Keep terminal open on error
+      // Keep terminal open on error
       console.log(theme.accent("\n[DEBUG] Press Enter to close this window..."));
       process.stdin.setRawMode(false);
       process.stdin.resume();
@@ -129,9 +118,27 @@ program
     }
   });
 
+program
+  .command("skills")
+  .description("List and inspect installed blockint skills")
+  .option("-i, --info <name>", "Show details for a specific skill")
+  .action(async (options) => {
+    try {
+      await skillsCommand({ info: options.info });
+    } catch (error: any) {
+      console.error("\n" + theme.error("Skills Error:") + " " + error.message);
+    }
+  });
+
 async function main() {
   try {
-    await program.parseAsync(process.argv);
+    // Default to chat if no command specified
+    if (process.argv.length <= 2) {
+      await ensureConfig();
+      await chatCommand({ model: config.model || "gemini-2.5-flash" });
+    } else {
+      await program.parseAsync(process.argv);
+    }
   } catch (error: any) {
     console.error(theme.error("Fatal Execution Error:"), error.message);
     await new Promise(resolve => setTimeout(resolve, 5000));
