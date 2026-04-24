@@ -32,27 +32,31 @@ export default function ConsolePage() {
 
   useEffect(() => {
     setMounted(true);
-    fetchLogs();
-  }, []);
+    
+    const eventSource = new EventSource("/api/console/stream");
+    
+    eventSource.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'log') {
+        setLogs((prev) => {
+          // Prevent duplicates by checking id or timestamp+message
+          const exists = prev.some(l => l.timestamp === data.timestamp && l.message === data.message);
+          if (exists) return prev;
+          return [...prev, data];
+        });
+        setLoading(false);
+      }
+    };
 
-  const fetchLogs = async () => {
-    try {
-      const res = await fetch("/api/chat");
-      const history = await res.json();
-      const mapped = history.reverse().map((h: any, i: number) => ({
-        id: i.toString(),
-        source: h.role === 'user' ? 'Operator' : 'ARES',
-        level: h.role === 'user' ? 'info' : 'security',
-        message: h.content,
-        timestamp: h.timestamp || new Date().toISOString()
-      }));
-      setLogs(mapped);
-    } catch (err) {
-      console.error("Failed to fetch logs:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    eventSource.onerror = (err) => {
+      console.error("SSE connection error:", err);
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });

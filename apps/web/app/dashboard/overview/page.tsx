@@ -11,6 +11,7 @@ import {
   Terminal,
   ExternalLink
 } from "lucide-react";
+import Link from "next/link";
 import { 
   XAxis, 
   YAxis, 
@@ -92,7 +93,9 @@ export default function OverviewPage() {
           </p>
         </div>
         <div className="flex gap-3 shrink-0">
-          <button className="px-5 py-2.5 bg-secondary text-secondary-foreground rounded-xl text-[14px] font-medium hover:bg-muted transition-all ring-shadow">Generate Report</button>
+          <Link href="/dashboard/reports" className="px-5 py-2.5 bg-secondary text-secondary-foreground rounded-xl text-[14px] font-medium hover:bg-muted transition-all ring-shadow">
+            Generate Report
+          </Link>
           <button 
             onClick={handleStartScan}
             disabled={isScanning}

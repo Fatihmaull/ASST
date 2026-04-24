@@ -1,7 +1,7 @@
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { HumanMessage, AIMessage, SystemMessage } from "@langchain/core/messages";
 import { createAllSubAgents, SUB_AGENT_CONFIGS, SubAgent } from "./sub-agents.js";
-import { ASSTPersistence } from "./persistence.js";
+import { ASSTPersistenceSQLite } from "./persistence-sqlite.js";
 
 const ORCHESTRATOR_MODEL = "gemini-2.5-flash";
 
@@ -44,12 +44,12 @@ ${SUB_AGENT_CONFIGS.map(c => `- **${c.name}**: ${c.description}`).join("\n")}
 export class Orchestrator {
   private llm: ChatGoogleGenerativeAI;
   private subAgents: Map<string, SubAgent>;
-  private persistence: ASSTPersistence;
+  private persistence: ASSTPersistenceSQLite;
   private repoRoot: string;
 
   constructor(repoRoot: string) {
     this.repoRoot = repoRoot;
-    this.persistence = new ASSTPersistence(repoRoot);
+    this.persistence = new ASSTPersistenceSQLite(repoRoot);
 
     const apiKey = process.env.GOOGLE_API_KEY;
     if (!apiKey) throw new Error("Missing GOOGLE_API_KEY for orchestrator");

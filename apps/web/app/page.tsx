@@ -25,9 +25,9 @@ export default function LandingPage() {
           <span className="text-xl font-serif font-medium tracking-tight">ARES</span>
         </div>
         <div className="hidden md:flex items-center gap-10 text-[14px] font-medium text-[#5e5d59]">
-          <a href="#features" className="hover:text-[#c96442] transition-colors">Framework</a>
-          <a href="#agents" className="hover:text-[#c96442] transition-colors">Intelligence</a>
-          <a href="#deploy" className="hover:text-[#c96442] transition-colors">Integrations</a>
+          <Link href="/intelligence" className="hover:text-[#c96442] transition-colors">Intelligence</Link>
+          <Link href="/integrations" className="hover:text-[#c96442] transition-colors">Integrations</Link>
+          <Link href="/pricing" className="hover:text-[#c96442] transition-colors">Pricing</Link>
         </div>
         <div className="flex items-center gap-4">
           <Link 
@@ -180,9 +180,12 @@ export default function LandingPage() {
            >
             Get Started Free
            </Link>
-           <button className="w-full sm:w-auto px-10 py-5 bg-transparent border-2 border-[#141413] rounded-2xl text-[18px] font-medium hover:bg-[#141413] hover:text-[#faf9f5] transition-all">
+           <Link 
+             href="/integrations" 
+             className="w-full sm:w-auto px-10 py-5 bg-transparent border-2 border-[#141413] rounded-2xl text-[18px] font-medium hover:bg-[#141413] hover:text-[#faf9f5] transition-all"
+           >
              View Documentation
-           </button>
+           </Link>
         </div>
       </section>
 

@@ -13,6 +13,7 @@ import {
   Save
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export default function SettingsPage() {
   return (
@@ -36,24 +37,39 @@ export default function SettingsPage() {
         <aside className="space-y-1">
            {[
              { id: 'general', label: 'General', icon: SettingsIcon, active: true },
+             { id: 'profile', label: 'Operator Profile', icon: User, link: '/dashboard/profile' },
              { id: 'security', label: 'Agent Security', icon: Shield },
              { id: 'intelligence', label: 'Intelligence Keys', icon: Key },
              { id: 'notifications', label: 'Alerting', icon: Bell },
              { id: 'network', label: 'Node Network', icon: Globe },
            ].map((item) => (
-             <button 
-               key={item.id} 
-               className={cn(
-                 "w-full flex items-center justify-between px-4 py-3 rounded-xl text-[14px] font-medium transition-all group",
-                 item.active ? "bg-secondary text-primary shadow-sm" : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
-               )}
-             >
-               <div className="flex items-center gap-3">
-                 <item.icon className="w-4 h-4" />
-                 {item.label}
-               </div>
-               {item.active && <ChevronRight className="w-3.5 h-3.5" />}
-             </button>
+             item.link ? (
+               <Link 
+                 key={item.id} 
+                 href={item.link}
+                 className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-[14px] font-medium text-muted-foreground hover:bg-secondary/50 hover:text-foreground transition-all"
+               >
+                 <div className="flex items-center gap-3">
+                   <item.icon className="w-4 h-4" />
+                   {item.label}
+                 </div>
+                 <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100" />
+               </Link>
+             ) : (
+               <button 
+                 key={item.id} 
+                 className={cn(
+                   "w-full flex items-center justify-between px-4 py-3 rounded-xl text-[14px] font-medium transition-all group",
+                   item.active ? "bg-secondary text-primary shadow-sm" : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+                 )}
+               >
+                 <div className="flex items-center gap-3">
+                   <item.icon className="w-4 h-4" />
+                   {item.label}
+                 </div>
+                 {item.active && <ChevronRight className="w-3.5 h-3.5" />}
+               </button>
+             )
            ))}
         </aside>
 

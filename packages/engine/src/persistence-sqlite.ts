@@ -65,6 +65,25 @@ export class ASSTPersistenceSQLite {
         alerts INTEGER DEFAULT 0,
         timestamp TEXT NOT NULL DEFAULT (datetime('now'))
       );
+      
+      CREATE TABLE IF NOT EXISTS targets (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        type TEXT NOT NULL,
+        status TEXT NOT NULL,
+        riskScore INTEGER DEFAULT 0,
+        owner TEXT,
+        lastSeen TEXT NOT NULL DEFAULT (datetime('now'))
+      );
+
+      CREATE TABLE IF NOT EXISTS profiles (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        role TEXT NOT NULL,
+        aiQuotaUsage INTEGER DEFAULT 0,
+        aiQuotaMax INTEGER DEFAULT 1000,
+        updatedAt TEXT NOT NULL DEFAULT (datetime('now'))
+      );
 
       CREATE INDEX IF NOT EXISTS idx_chat_timestamp ON chat_history(timestamp);
       CREATE INDEX IF NOT EXISTS idx_scan_timestamp ON scan_results(timestamp);
@@ -189,6 +208,37 @@ export class ASSTPersistenceSQLite {
       WHERE timestamp > ?
     `);
     return stmt.get(sinceDate);
+  }
+
+  // ─── Targets ────────────────────────────────────────────────────
+
+  async addTarget(target: any) {
+    const stmt = this.db.prepare(
+      "INSERT OR REPLACE INTO targets (id, name, type, status, riskScore, owner, lastSeen) VALUES (?, ?, ?, ?, ?, ?, ?)"
+    );
+    stmt.run(target.id, target.name, target.type, target.status, target.riskScore || 0, target.owner, new Date().toISOString());
+  }
+
+  async getTargets() {
+    const stmt = this.db.prepare("SELECT * FROM targets ORDER BY lastSeen DESC");
+    return stmt.all();
+  }
+
+  // ─── Profiles ───────────────────────────────────────────────────
+
+  async getProfile(id: string) {
+    const stmt = this.db.prepare("SELECT * FROM profiles WHERE id = ?");
+    let profile = stmt.get(id);
+    if (!profile && id === 'alice') {
+      // Seed default profile
+      this.db.prepare("INSERT INTO profiles (id, name, role, aiQuotaUsage, aiQuotaMax) VALUES (?, ?, ?, ?, ?)").run('alice', 'Alice Operator', 'Security Lead', 142, 1000);
+      profile = stmt.get(id);
+    }
+    return profile;
+  }
+
+  async updateProfileUsage(id: string, increment: number) {
+    this.db.prepare("UPDATE profiles SET aiQuotaUsage = aiQuotaUsage + ?, updatedAt = ? WHERE id = ?").run(increment, new Date().toISOString(), id);
   }
 
   // ─── Lifecycle ──────────────────────────────────────────────────
